@@ -35,9 +35,24 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 
 # Importing data
-movies = pd.read_csv('resources/data/movies.csv', sep = ',',delimiter=',')
-ratings = pd.read_csv('resources/data/ratings.csv')
+movies = pd.read_csv('resources/data/movies.csv',delimiter=',')
+imdb = pd.read_csv('resources/data/imdb_data.csv')
 movies.dropna(inplace=True)
+
+
+ #Function to convert all strings to lower case and strip names of spaces
+def clean_data(x):
+    if isinstance(x, list):
+        return str.lower(i.replace(" ", ""))
+    else:
+        #Check if director exists. If not, return empty string
+        if isinstance(x, str):
+            return str.lower(x.replace(" ", ""))
+        else:
+            return ''
+
+def create_soup(x):
+    return x['plot_keywords'].str.replace('|', ' ') + ' ' + x['title_cast'].str.replace('|', ' ') + ' ' + x['director'].str.replace('|', ' ') + ' ' + x['genres'].str.replace('|', ' ')
 
 def data_preprocessing(subset_size):
     """Prepare data for use within Content filtering algorithm.
@@ -53,10 +68,14 @@ def data_preprocessing(subset_size):
         Subset of movies selected for content-based filtering.
 
     """
+    df2=movies.merge(imdb,on='movieId',how='left')
+    features=['plot_keywords','title_cast','director','genres']
+    for feature in features:
+        df2[feature] = df2[feature].apply(clean_data)
     # Split genre data into individual words.
-    movies['keyWords'] = movies['genres'].str.replace('|', ' ')
+    df2['keyWords'] = create_soup(df2)
     # Subset of the data
-    movies_subset = movies[:subset_size]
+    movies_subset = df2[:subset_size]
     return movies_subset
 
 # !! DO NOT CHANGE THIS FUNCTION SIGNATURE !!
@@ -86,7 +105,7 @@ def content_model(movie_list,top_n=10):
     count_matrix = count_vec.fit_transform(data['keyWords'])
     indices = pd.Series(data['title'])
     cosine_sim = cosine_similarity(count_matrix, count_matrix)
-    # Getting the index of the movie that matches the title
+    #  Getting the index of the movie that matches the title
     idx_1 = indices[indices == movie_list[0]].index[0]
     idx_2 = indices[indices == movie_list[1]].index[0]
     idx_3 = indices[indices == movie_list[2]].index[0]
