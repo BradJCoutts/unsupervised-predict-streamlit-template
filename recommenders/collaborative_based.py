@@ -64,21 +64,22 @@ def get_movie_recommendation(movie_name):
     movie_list = movies[movies['title']==movie_name]  
     if len(movie_list)>0:        
         movie_idx= movie_list.iloc[0]['movieId']
+        
         if movie_idx in set(final_dataset['movieId'].values):
             movie_idx = final_dataset[final_dataset['movieId'] == movie_idx].index[0]
+            distances , indices = knn.kneighbors(csr_data[movie_idx],n_neighbors=n_movies_to_reccomend+1)    
+            rec_movie_indices = sorted(list(zip(indices.squeeze().tolist(),distances.squeeze().tolist())),key=lambda x: x[1])[:0:-1]
+
+            recommend_frame = []
+
+            for val in rec_movie_indices:
+                movie_idx = final_dataset.iloc[val[0]]['movieId']
+                idx = movies[movies['movieId'] == movie_idx].index
+                recommend_frame.append({'Title':movies.iloc[idx]['title'].values[0],'Distance':val[1]})
+            df = pd.DataFrame(recommend_frame,index=range(1,n_movies_to_reccomend+1))
+            return df
         else:
             return "No movies found. Please check your input"
-        distances , indices = knn.kneighbors(csr_data[movie_idx],n_neighbors=n_movies_to_reccomend+1)    
-        rec_movie_indices = sorted(list(zip(indices.squeeze().tolist(),distances.squeeze().tolist())),key=lambda x: x[1])[:0:-1]
-        recommend_frame = []
-        for val in rec_movie_indices:
-            movie_idx = final_dataset.iloc[val[0]]['movieId']
-            idx = movies[movies['movieId'] == movie_idx].index
-            recommend_frame.append({'Title':movies.iloc[idx]['title'].values[0],'Distance':val[1]})
-        df = pd.DataFrame(recommend_frame,index=range(1,n_movies_to_reccomend+1))
-        return df
-    else:
-        return "No movies found. Please check your input"
 
 # !! DO NOT CHANGE THIS FUNCTION SIGNATURE !!
 # You are, however, encouraged to change its content.  
@@ -99,9 +100,6 @@ def collab_model(movie_list,top_n=10):
         Titles of the top-n movie recommendations to the user.
 
     """
-    # We make use of an SVD model trained on a subset of the MovieLens 10k dataset.
-    
-
     
     top_movies=[]
     for x in movie_list:
