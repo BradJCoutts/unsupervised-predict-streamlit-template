@@ -43,7 +43,7 @@ from surprise import SVD, NormalPredictor, BaselineOnly, KNNBasic, NMF
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Importing data
-movies = pd.read_csv("resources/data/movies.csv")
+movies = pd.read_csv("resources/data/movies.csv",delimiter=',')
 ratings = pd.read_csv("resources/data/ratings.csv")
 
 final_dataset = ratings.pivot(index='movieId',columns='userId',values='rating')
