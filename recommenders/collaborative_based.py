@@ -84,9 +84,7 @@ def get_movie_recommendation(movie_name):
             recommend_frame.append({'Title':movies.iloc[idx]['title'].values[0],'Distance':val[1]})
         df = pd.DataFrame(recommend_frame,index=range(1,n_movies_to_reccomend+1))
         return df
-    
     else:
-        
         return "No movies found. Please check your input"
 
 # !! DO NOT CHANGE THIS FUNCTION SIGNATURE !!
@@ -119,7 +117,7 @@ def collab_model(movie_list,top_n=10):
         y+=len(x)
     if y>0:
         top_movies=pd.concat(top_movies)
-        return top_movies.sort_values('Distance',ascending=False)[
+        return top_movies.sort_values('Distance',ascending=False)[:10]
     else: 
         return ['No movies found. Please check your input']
     
