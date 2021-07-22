@@ -43,15 +43,14 @@ from surprise import SVD, NormalPredictor, BaselineOnly, KNNBasic, NMF
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Importing data
-movies_df = pd.read_csv('resources/data/movies.csv',delimiter=',')
-ratings_df = pd.read_csv('resources/data/ratings.csv')
-ratings_df.drop(['timestamp'], axis=1,inplace=True)
+movies = pd.read_csv("resources/data/movies.csv")
+ratings = pd.read_csv("resources/data/ratings.csv")
 
 # We make use of an SVD model trained on a subset of the MovieLens 10k dataset.
-final_dataset = ratings_df.pivot(index='movieId',columns='userId',values='rating')
+final_dataset = ratings.pivot(index='movieId',columns='userId',values='rating')
 final_dataset.fillna(0,inplace=True)
-no_user_voted = ratings_df.groupby('movieId')['rating'].agg('count')
-no_movies_voted = ratings_df.groupby('userId')['rating'].agg('count')
+no_user_voted = ratings.groupby('movieId')['rating'].agg('count')
+no_movies_voted = ratings.groupby('userId')['rating'].agg('count')
 final_dataset=final_dataset.loc[:,no_movies_voted[no_movies_voted > 50].index]
 final_dataset = final_dataset.loc[no_user_voted[no_user_voted > 10].index,:]
 csr_data = csr_matrix(final_dataset.values)
@@ -120,6 +119,7 @@ def collab_model(movie_list,top_n=10):
         y+=len(x)
     if y>0:
         top_movies=pd.concat(top_movies)
+        return top_movies.sort_values('Distance',ascending=False)[
     else: 
         return ['No movies found. Please check your input']
-    return pd.concat(top_movies).sort_values('Distance',ascending=False)[:10]
+    
