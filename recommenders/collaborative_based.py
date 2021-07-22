@@ -64,7 +64,7 @@ knn.fit(csr_data)
 def get_movie_recommendation(movie_name):
     n_movies_to_reccomend = 10
     movie_list = movies[movies['title']==movie_name]  
-    if len(movie_list):        
+    if len(movie_list)>0:        
         movie_idx= movie_list.iloc[0]['movieId']
         
         if movie_idx in set(final_dataset['movieId'].values):
