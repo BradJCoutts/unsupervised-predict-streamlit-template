@@ -61,10 +61,9 @@ def get_movie_recommendation(movie_name):
     n_movies_to_reccomend = 10
     movie_list = movies[movies['title']==movie_name]  
     if len(movie_list)>0:        
-        movie_idx= movie_list.iloc[0]['movieId']
         
-        if movie_idx in set(final_dataset['movieId'].values):
-            movie_idx = final_dataset[final_dataset['movieId'] == movie_idx].index[0]
+        if movie_list.iloc[0]['movieId'] in set(final_dataset['movieId'].values):
+            movie_idx = final_dataset[final_dataset['movieId'] == movie_list.iloc[0]['movieId']].index[0]
             distances , indices = knn.kneighbors(csr_data[movie_idx],n_neighbors=n_movies_to_reccomend+1)    
             rec_movie_indices = sorted(list(zip(indices.squeeze().tolist(),distances.squeeze().tolist())),key=lambda x: x[1])[:0:-1]
 
@@ -117,3 +116,6 @@ def collab_model(movie_list,top_n=10):
         return top_movies.sort_values('Distance',ascending=False)[:10]
     else: 
         return ['No movies found. Please check your input']
+
+
+# 
