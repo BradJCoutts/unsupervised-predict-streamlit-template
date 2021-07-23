@@ -35,8 +35,6 @@ from sklearn.neighbors import NearestNeighbors
 
 import pandas as pd
 import numpy as np
-import pickle
-import copy
 from surprise import Reader, Dataset
 from surprise import SVD, NormalPredictor, BaselineOnly, KNNBasic, NMF
 from sklearn.metrics.pairwise import cosine_similarity
@@ -53,9 +51,6 @@ final_dataset=final_dataset.loc[:,no_movies_voted[no_movies_voted > 50].index]
 final_dataset = final_dataset.loc[no_user_voted[no_user_voted > 10].index,:]
 csr_data = csr_matrix(final_dataset.values)
 final_dataset.reset_index(inplace=True)
-
-
-# In[3]:
 
 
 knn = NearestNeighbors(metric='cosine', algorithm='brute', n_neighbors=20, n_jobs=-1)
@@ -122,7 +117,3 @@ def collab_model(movie_list,top_n=10):
         return top_movies.sort_values('Distance',ascending=False)[:10]
     else: 
         return ['No movies found. Please check your input']
-
-
-# 
-    
