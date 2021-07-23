@@ -26,7 +26,6 @@
     filtering algorithm for rating predictions on Movie data.
 
 """
-
 # Script dependencies
 import pandas as pd
 import numpy as np
@@ -55,6 +54,10 @@ final_dataset = final_dataset.loc[no_user_voted[no_user_voted > 10].index,:]
 csr_data = csr_matrix(final_dataset.values)
 final_dataset.reset_index(inplace=True)
 
+
+# In[3]:
+
+
 knn = NearestNeighbors(metric='cosine', algorithm='brute', n_neighbors=20, n_jobs=-1)
 knn.fit(csr_data)
 
@@ -70,16 +73,21 @@ def get_movie_recommendation(movie_name):
             distances , indices = knn.kneighbors(csr_data[movie_idx],n_neighbors=n_movies_to_reccomend+1)    
             rec_movie_indices = sorted(list(zip(indices.squeeze().tolist(),distances.squeeze().tolist())),key=lambda x: x[1])[:0:-1]
 
-            recommend_frame = []
-
+            title=[]
+            distance=[]
+            df=pd.DataFrame([])
             for val in rec_movie_indices:
                 movie_idx = final_dataset.iloc[val[0]]['movieId']
                 idx = movies[movies['movieId'] == movie_idx].index
-                recommend_frame.append({'Title':movies.iloc[idx]['title'].values[0],'Distance':val[1]})
-            df = pd.DataFrame(recommend_frame,index=range(1,n_movies_to_reccomend+1))
+                title.append(movies.iloc[idx]['title'].values[0])
+                distance.append(val[1])
+            df['Title'] = title
+            df['Distance']=distance
             return df
         else:
             return "No movies found. Please check your input"
+
+
 
 # !! DO NOT CHANGE THIS FUNCTION SIGNATURE !!
 # You are, however, encouraged to change its content.  
@@ -114,4 +122,7 @@ def collab_model(movie_list,top_n=10):
         return top_movies.sort_values('Distance',ascending=False)[:10]
     else: 
         return ['No movies found. Please check your input']
+
+
+# 
     
