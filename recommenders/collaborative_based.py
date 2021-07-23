@@ -110,6 +110,7 @@ def collab_model(movie_list,top_n=10):
     if y>0:
         top_movies=pd.concat(top_movies)
         top_movies=top_movies.sort_values('Distance',ascending=False)
+        top_movies=top_movies[:10]
         return top_movies['Title']
     else: 
         return ['No movies found. Please check your input']
